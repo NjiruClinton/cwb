@@ -18,7 +18,7 @@ type Message struct {
 
 // Client represents a connected user
 type Client struct {
-	connection   net.Conn    // TCP connection
+	conn         net.Conn    // TCP connection
 	username     string      // Display name
 	outgoing     chan string // Buffered channel for writes
 	lastActive   time.Time   // For idle detection
