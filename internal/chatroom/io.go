@@ -200,3 +200,104 @@ func writeMessages(client *Client) {
 		}
 	}
 }
+
+func handleCommand(client *Client, chatroom *Chatroom, command string) {
+	parts := strings.Fields(command)
+	if len(parts) == 0 {
+		return
+	}
+
+	switch parts[0] {
+	case "/users":
+		chatroom.listUsers <- client
+
+	case "/starts":
+		client.mu.Lock()
+		stats := fmt.Sprintf("Your Stats:\n")
+		stats += fmt.Sprintf(" Messages sent: %d\n", client.messagesSent)
+		stats += fmt.Sprintf(" Messages sent: %d\n", client.messagesSent)
+		stats += fmt.Sprintf(" Messages received: %d\n", client.messagesRecv)
+		stats += fmt.Sprintf(" Last Active: %s ago\n", time.Since(client.lastActive).Round(time.Second))
+		client.mu.Unlock()
+
+		select {
+		case client.outgoing <- stats:
+		default:
+		}
+	case "/msg":
+		if len(parts) < 3 {
+			select {
+			case client.outgoing <- "Usage: /msg <username> <message>\n":
+			default:
+			}
+			return
+		}
+		targetUsername := parts[1]
+		messageText := strings.Join(parts[2:], " ")
+
+		targetClient := chatroom.findClientByUsername(targetUsername)
+		if targetClient == nil {
+			select {
+			case client.outgoing <- fmt.Sprintf("User %s not found\n", targetUsername):
+			default:
+			}
+			return
+		}
+
+		privateMsg := fmt.Sprintf("[From %s]: %s\n", client.username, messageText)
+		select {
+		case targetClient.outgoing <- privateMsg:
+		default:
+			select {
+			case client.outgoing <- fmt.Sprintf("%s's inbox is full\n", targetUsername):
+			default:
+			}
+			return
+		}
+
+		select {
+		case client.outgoing <- fmt.Sprintf("Message sent to %s\n", targetUsername):
+		default:
+		}
+	case "/history":
+		count := 20
+		if len(parts) > 1 {
+			fmt.Scanf(parts[1], "%d", count)
+		}
+		if count > 100 {
+			count = 100
+		}
+		cr.sendHistory(client, count)
+
+	case "/token":
+		chatroom.sessionsMu.Lock()
+		session := chatroom.sessions[client.username]
+		chatroom.sessionsMu.Unlock()
+
+		if session != nil {
+			msg := fmt.Sprintf("Your reconnect token:\n")
+			msg += fmt.Sprintf("   reconnect:%s:%s\n", client.username, session.ReconnectToken)
+			select {
+			case client.outgoing <- msg:
+			default:
+			}
+		}
+	case "/quit":
+		announcement := fmt.Sprintf("%s left the chat\n", client.username)
+		chatroom.broadcast <- announcement
+
+		select {
+		case client.outgoing <- "Goodbye!\n":
+		default:
+		}
+
+		time.Sleep(100 * time.Millisecond)
+		client.conn.Close()
+
+	default:
+		select {
+		case client.outgoing <- fmt.Sprintf("Unknown: %s\n", parts[0]):
+		default:
+		}
+	}
+}

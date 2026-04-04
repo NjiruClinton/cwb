@@ -54,7 +54,7 @@ func (cr *Chatroom) periodicSnapshots() {
 
 func (cr *Chatroom) Run() {
 	fmt.Println("ChatRoom heartbeat started...")
-	go cr.cleanupInactiveClient()
+	go cr.cleanupInactiveClients()
 
 	for {
 		select {
