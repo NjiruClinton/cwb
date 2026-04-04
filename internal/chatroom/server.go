@@ -59,3 +59,7 @@ func (cr *Chatroom) shutdown() {
 	}
 	fmt.Println("Shutdown complete")
 }
+
+func StartServer() {
+	runServer()
+}
