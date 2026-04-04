@@ -118,7 +118,7 @@ func (cr *Chatroom) sendHistory(client *Client, count int) {
 	}
 }
 
-func (cr *Chatroom) sendUaerList(client *Client) {
+func (cr *Chatroom) sendUserList(client *Client) {
 	cr.mu.Lock()
 	defer cr.mu.Unlock()
 
