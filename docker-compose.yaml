@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  chatroom:
+    build: .
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./chatdata:/root/chatdata
+    restart: unless-stopped

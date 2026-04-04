@@ -1,0 +1,14 @@
+[Unit]
+Description=Chatroom Server
+After=network.target
+
+[Service]
+Type=simple
+User=chatroom
+WorkingDirectory=/opt/chatroom
+ExecStart=/opt/chatroom/server
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -148,7 +148,7 @@ func readMessages(client *Client, chatRoom *Chatroom) {
 			}
 		}
 
-		client.makeActive() // Update activity timestamp
+		client.markActive() // Update activity timestamp
 
 		message = strings.TrimSpace(message)
 		if message == "" {
@@ -211,7 +211,7 @@ func handleCommand(client *Client, chatroom *Chatroom, command string) {
 	case "/users":
 		chatroom.listUsers <- client
 
-	case "/starts":
+	case "/stats":
 		client.mu.Lock()
 		stats := fmt.Sprintf("Your Stats:\n")
 		stats += fmt.Sprintf(" Messages sent: %d\n", client.messagesSent)
@@ -267,7 +267,7 @@ func handleCommand(client *Client, chatroom *Chatroom, command string) {
 		if count > 100 {
 			count = 100
 		}
-		cr.sendHistory(client, count)
+		chatroom.sendHistory(client, count)
 
 	case "/token":
 		chatroom.sessionsMu.Lock()

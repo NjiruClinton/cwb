@@ -1,0 +1,23 @@
+[
+  {
+    "id": 0,
+    "from": "system",
+    "content": "*** Alice joined the chat ***\n",
+    "timestamp": "2026-04-04T21:14:33.799748+03:00",
+    "channel": "global"
+  },
+  {
+    "id": 1,
+    "from": "system",
+    "content": "*** Bob joined the chat ***\n",
+    "timestamp": "2026-04-04T21:14:33.828053+03:00",
+    "channel": "global"
+  },
+  {
+    "id": 2,
+    "from": "Alice",
+    "content": " Hello!",
+    "timestamp": "2026-04-04T21:14:33.92874+03:00",
+    "channel": "global"
+  }
+]
